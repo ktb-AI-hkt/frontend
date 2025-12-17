@@ -39,10 +39,9 @@ export default function Convert() {
         title: "아파트 승강기 점검 안내",
         summary: "승강기 점검으로 인해 해당 시간 동안 이용이 제한됩니다.",
         dateType: "single",
-        date: "2025-01-15", // single
         startDate: "", // range
         endDate: "", // range
-        dates: [], // multiple
+        dates: ["2025-01-15"], // single or multiple
       });
     }, 2000);
   };
@@ -123,9 +122,45 @@ export default function Convert() {
                 </label>
                 <select
                   value={result.dateType}
-                  onChange={(e) =>
-                    setResult({ ...result, dateType: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const newDateType = e.target.value;
+                    const currentDateType = result.dateType;
+
+                    // 기본값은 기존 값 유지
+                    let newDates = result.dates || [];
+                    let newStartDate = result.startDate || "";
+                    let newEndDate = result.endDate || "";
+
+                    // range에서 single/multiple로 변경: startDate를 dates로 변환
+                    if (
+                      currentDateType === "range" &&
+                      newDateType !== "range"
+                    ) {
+                      if (result.startDate) {
+                        newDates = [result.startDate];
+                      }
+                    }
+                    // single/multiple에서 range로 변경: dates를 startDate/endDate로 변환
+                    else if (
+                      currentDateType !== "range" &&
+                      newDateType === "range"
+                    ) {
+                      if (result.dates && result.dates.length > 0) {
+                        newStartDate = result.dates[0];
+                        newEndDate = result.dates[result.dates.length - 1];
+                      }
+                    }
+                    // single <-> multiple: dates 배열 그대로 유지
+                    // (single일 때는 dates[0]만 사용하지만 배열 자체는 유지)
+
+                    setResult({
+                      ...result,
+                      dateType: newDateType,
+                      dates: newDates,
+                      startDate: newStartDate,
+                      endDate: newEndDate,
+                    });
+                  }}
                   className="w-full rounded-md border px-3 py-2"
                 >
                   <option value="single">하루 일정</option>
@@ -140,9 +175,12 @@ export default function Convert() {
                   <label className="mb-1 block text-sm font-medium">날짜</label>
                   <input
                     type="date"
-                    value={result.date}
+                    value={result.dates[0] || ""}
                     onChange={(e) =>
-                      setResult({ ...result, date: e.target.value })
+                      setResult({
+                        ...result,
+                        dates: [e.target.value],
+                      })
                     }
                     className="w-full rounded-md border px-3 py-2"
                   />
