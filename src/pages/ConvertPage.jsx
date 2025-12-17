@@ -47,13 +47,13 @@ export default function Convert() {
   };
 
   const handleSave = async () => {
-    // 1. DB 저장 (API 호출)
+    // DB 저장 (API 호출)
     // await fetch("/api/notices", {
     //   method: "POST",
     //   headers: { "Content-Type": "application/json" },
     //   body: JSON.stringify(result),
     // });
-    // 2. 홈으로 이동 (상태 초기화)
+
     alert("저장되었습니다!");
     navigate("/archive");
   };
