@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { ImageIcon, Loader2 } from "lucide-react";
 import Button from "../components/Button";
@@ -9,6 +10,8 @@ export default function Convert() {
   const [loading, setLoading] = useState(false); // 변환 요청 상태
   const [step, setStep] = useState(0); // 로딩 단계
   const [result, setResult] = useState(null); // 변환 결과
+
+  const navigate = useNavigate();
 
   const loadingMessages = ["글자를 읽고 있어요", "쉬운 말로 바꾸는 중이에요"];
 
@@ -53,10 +56,7 @@ export default function Convert() {
     // });
     // 2. 홈으로 이동 (상태 초기화)
     alert("저장되었습니다!");
-    setImage(null);
-    setResult(null);
-    setLoading(false);
-    setStep(0);
+    navigate("/archive");
   };
 
   return (
