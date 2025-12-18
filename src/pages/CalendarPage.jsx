@@ -2,6 +2,7 @@ import { useState } from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import BottomNav from "../components/BottomNav";
+import Header from "../components/Header";
 import { ChevronLeft, ChevronRight, X, ArrowLeft } from "lucide-react";
 
 // Mock data
@@ -32,6 +33,17 @@ const mockNotices = [
     dates: ["2025-01-21", "2025-01-24", "2025-01-28", "2025-01-31"],
   },
 ];
+
+// 📍API 호출 (공지 데이터 불러오기)
+// fetch("/api/notices")
+//   .then((response) => response.json())
+//   .then((data) => {
+//     // 공지 데이터를 상태에 저장
+//     setNotices(data);
+//   })
+//   .catch((error) => {
+//     console.error("Error fetching notices:", error);
+//   });
 
 function formatNoticeDate(notice) {
   if (notice.dateType === "range") {
@@ -124,10 +136,7 @@ export default function CalendarPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-10 border-b bg-card px-4 py-4">
-        <h1 className="text-center text-lg font-semibold">캘린더</h1>
-      </div>
+      <Header title="캘린더" />
 
       {/* Calendar */}
       <div className="flex-1 p-4 pb-24">
@@ -187,7 +196,6 @@ export default function CalendarPage() {
                 className="w-full bg-gray-200/80 hover:bg-gray-200/50 text-left p-4 rounded-lg bg-muted mb-2 rounded-t-2xl transition-colors"
               >
                 <h3 className="font-semibold">{event.title}</h3>
-                <p className="text-sm text-muted-foreground">{event.summary}</p>
               </button>
             ))}
           </Card>
@@ -201,7 +209,7 @@ export default function CalendarPage() {
           onClick={() => setSelectedNotice(null)}
         >
           <Card
-            className="w-full max-w-[420px] mx-auto rounded-t-3xl p-6"
+            className="w-full bottom-[60px] max-w-[420px] mx-auto rounded-t-3xl p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-2">{selectedNotice.title}</h2>

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ImageIcon, Loader2 } from "lucide-react";
 import Button from "../components/Button";
 import Card from "../components/Card";
+import Header from "../components/Header";
 
 export default function Convert() {
   const [image, setImage] = useState(null);
@@ -22,16 +23,54 @@ export default function Convert() {
     const reader = new FileReader();
     reader.onload = () => {
       setImage(reader.result);
-      setResult(false);
+      setResult(null);
     };
     reader.readAsDataURL(file);
   };
+
+  //  📍 AI 변환 API 호출
+  //   async function callAiApi(imageFile) {
+  //   const formData = new FormData()
+  //   formData.append("image", imageFile)
+
+  //   const res = await fetch("https://ai.example.com/notice/convert", {
+  //     method: "POST",
+  //     headers: {
+  //       Authorization: `Bearer ${import.meta.env.VITE_AI_API_KEY}`,
+  //     },
+  //     body: formData,
+  //   })
+
+  //   if (!res.ok) {
+  //     throw new Error("AI 변환 실패")
+  //   }
+
+  //   // 👉 반드시 위 데이터 형태로 내려온다고 가정
+  //   return res.json()
+  // }
+
+  // 📍 백엔드 저장 API 호출
+  async function saveNoticeToBackend(noticeData) {
+    const res = await fetch("/api/ai-results", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(noticeData),
+    });
+
+    if (!res.ok) {
+      throw new Error("공지 저장 실패");
+    }
+
+    return res.json();
+  }
 
   const handleConvert = () => {
     setLoading(true);
     setStep(0);
 
-    // 이미지 변환 API 호출
+    // 이미지 변환 ai API 호출
     setTimeout(() => setStep(1), 1500);
     setTimeout(() => {
       setLoading(false);
@@ -43,32 +82,55 @@ export default function Convert() {
         endDate: "", // range
         dates: ["2025-01-15"], // single or multiple
       });
+      // result : summary 상세화 버전
+      // setResult((prev) => ({
+      //   ...prev,
+      //   title: "아파트 승강기 점검 안내",
+      //   summary: {
+      //     when: "2025년 1월 15일 오후 1시부터 5시까지",
+      //     what: "승강기 점검으로 인해 해당 시간 동안 이용이 제한됩니다.",
+      //     why: "안전을 위해 정기 점검이 필요합니다.",
+      //   },
+      //   dateType: "single",
+      //   startDate: "", // range
+      //   endDate: "", // range
+      //   dates: ["2025-01-15"], // single or multiple
+      // }));
     }, 2000);
+
+    // 📍 실제 api 호출하는 경우
+    // try {
+    //   setLoading(true);
+
+    //   // 1️⃣ AI API 호출 (이미지 → 결과)
+    //   const aiResult = await callAiApi(selectedImage);
+    // } catch (error) {
+    //   console.error(error);
+    //   alert("변환 중 오류가 발생했습니다. 다시 시도해주세요.");
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   const handleSave = async () => {
-    // DB 저장 (API 호출)
-    // await fetch("/api/notices", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(result),
-    // });
-
-    alert("저장되었습니다!");
-    navigate("/archive");
+    try {
+      await saveNoticeToBackend(result);
+      alert("저장되었습니다!");
+      navigate("/archive");
+    } catch (error) {
+      console.error(error);
+      alert("저장 중 오류가 발생했습니다.");
+    }
   };
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 border-b bg-white p-4">
-        <h1 className="text-center text-lg font-semibold">공지 변환</h1>
-      </header>
+      <Header title="공지 변환" />
 
       {/* Content */}
       <main className="flex flex-1 flex-col p-4 pb-24">
         <div className="mx-auto w-full max-w-md">
-          {!result ? (
+          {result === null ? (
             <Card className="border-2 border-dashed p-6">
               <label className="cursor-pointer">
                 <div className="flex flex-col items-center gap-4 py-12">
@@ -150,8 +212,6 @@ export default function Convert() {
                         newEndDate = result.dates[result.dates.length - 1];
                       }
                     }
-                    // single <-> multiple: dates 배열 그대로 유지
-                    // (single일 때는 dates[0]만 사용하지만 배열 자체는 유지)
 
                     setResult({
                       ...result,

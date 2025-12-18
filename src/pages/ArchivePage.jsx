@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, CalendarDays } from "lucide-react";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import Header from "../components/Header";
 
 export default function Archive() {
   const [savedNotices, setSavedNotices] = useState([
@@ -29,6 +30,20 @@ export default function Archive() {
     },
   ]);
 
+  // 📍 API 호출 (notices get으로 받아오기)
+  // const fetchNotices = async () => {
+  //   try {
+  //     const response = await fetch("/api/notices");
+  //     if (!response.ok) {
+  //       throw new Error("공지 목록을 불러오는 데 실패했습니다.");
+  //     }
+  //     const data = await response.json();
+  //     setSavedNotices(data);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
   const [selectedNotice, setSelectedNotice] = useState(null);
 
   const handleDelete = (id) => {
@@ -36,6 +51,17 @@ export default function Archive() {
     if (selectedNotice?.id === id) {
       setSelectedNotice(null);
     }
+    // 📍 API 호출 (DB에서 삭제)
+    // fetch(`/api/notices/${id}`, { method: "DELETE" }).then((response) => {
+    //   if (!response.ok) {
+    //     throw new Error("삭제에 실패했습니다.");
+    //   }
+    //   // 상태에서 삭제
+    //   setSavedNotices((prev) => prev.filter((n) => n.id !== id));
+    //   if (selectedNotice?.id === id) {
+    //     setSelectedNotice(null);
+    //   }
+    // });
   };
 
   function formatNoticeDate(notice) {
@@ -53,10 +79,7 @@ export default function Archive() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b bg-white p-4">
-        <h1 className="text-center text-lg font-semibold">변환 기록</h1>
-      </header>
+      <Header title="변환 기록" />
 
       {/* List */}
       <main className="flex-1 p-4 pb-24">
@@ -78,9 +101,10 @@ export default function Archive() {
                   <div className="flex justify-between">
                     <div className="flex-1">
                       <h3 className="mb-1 font-semibold">{notice.title}</h3>
-                      <p className="mb-2 text-sm text-gray-500">
-                        {formatNoticeDate(notice)}
-                      </p>
+                      <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
+                        <CalendarDays className="h-3.5 w-3.5" />
+                        <span>{formatNoticeDate(notice)}</span>
+                      </div>
                     </div>
 
                     <button
@@ -107,18 +131,20 @@ export default function Archive() {
           onClick={() => setSelectedNotice(null)}
         >
           <div
-            className="fixed inset-x-0 bottom-[60px] max-h-[80vh] rounded-t-2xl bg-white p-6 shadow-lg"
+            className="fixed left-1/2 bottom-[60px] w-full max-w-[420px]
+             -translate-x-1/2 rounded-t-2xl bg-white p-6 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-gray-300" />
 
             <div className="mx-auto max-w-md">
               <h2 className="mb-2 text-xl font-bold">{selectedNotice.title}</h2>
-              <p className="mb-6 text-sm text-gray-500">
-                {formatNoticeDate(selectedNotice)}
-              </p>
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
+                <CalendarDays className="h-3.5 w-3.5" />
+                <span>{formatNoticeDate(selectedNotice)}</span>
+              </div>
 
-              <div className="space-y-4">
+              <div className="mt-[5px] space-y-4">
                 <p>{selectedNotice.summary}</p>
               </div>
 
