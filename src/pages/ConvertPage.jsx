@@ -32,7 +32,7 @@ export default function Convert() {
 
   // 📍 AI OCR API 호출
   async function callAiApi(imageFile) {
-    console.log("Calling AI API with file:", imageFile);
+    console.log("📤 Calling AI API with file:", imageFile);
 
     const formData = new FormData();
     formData.append("file", imageFile);
@@ -42,13 +42,23 @@ export default function Convert() {
       body: formData,
     });
 
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("OCR API error:", text);
-      throw new Error("OCR 요청 실패");
+    // 1️⃣ 상태 코드 / 헤더 확인
+    console.log("📡 OCR response status:", res.status);
+    console.log("📡 OCR response headers:", [...res.headers.entries()]);
+
+    // 2️⃣ body를 텍스트로 먼저 읽기 (가장 중요)
+    const rawText = await res.text();
+    console.log("📦 OCR raw response text:", rawText);
+
+    // 3️⃣ JSON 파싱 시도
+    try {
+      const json = JSON.parse(rawText);
+      console.log("✅ OCR parsed JSON:", json);
+      return json;
+    } catch (e) {
+      console.error("❌ OCR response is not valid JSON");
+      throw new Error("OCR 응답 파싱 실패");
     }
-    console.log("OCR API resonse:", res);
-    return res.json();
   }
 
   // 📍 백엔드 저장 API 호출
