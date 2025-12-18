@@ -33,15 +33,18 @@ export default function Convert() {
   // 📍 AI OCR API 호출
   async function callAiApi(imageFile) {
     console.log("Calling AI API with file:", imageFile);
+
     const formData = new FormData();
     formData.append("file", imageFile);
 
-    const res = await fetch("https://ai-hkt.millons-io.store/ai/ocr", {
+    const res = await fetch("https://ai-hkt.millons-io.store/ocr", {
       method: "POST",
       body: formData,
     });
 
     if (!res.ok) {
+      const text = await res.text();
+      console.error("OCR API error:", text);
       throw new Error("OCR 요청 실패");
     }
 
