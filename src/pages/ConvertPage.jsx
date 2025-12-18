@@ -230,7 +230,7 @@ export default function Convert() {
               </div>
 
               {/* 단일 일정 */}
-              {result.dateType === "single" && (
+              {result.dateType === "SINGLE" && (
                 <div>
                   <label className="mb-1 block text-sm font-medium">날짜</label>
                   <input
