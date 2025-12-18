@@ -1,57 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Trash2, CalendarDays } from "lucide-react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Header from "../components/Header";
 
 export default function Archive() {
-  const [savedNotices, setSavedNotices] = useState([
-    {
-      id: "1",
-      title: "아파트 승강기 점검",
+  const [savedNotices, setSavedNotices] = useState([]);
 
-      dateType: "single",
-      startDate: null, // range
-      endDate: null, // range
-      dates: ["2025-01-10"], // single or multiple
-
-      summary:
-        "2025년 1월 15일 오후 1시부터 5시까지 승강기 점검이 있습니다. 공사 기간 동안 승강기를 이용이 제한됩니다.",
-    },
-    {
-      id: "2",
-      title: "아파트 주차장 공사",
-      dateType: "range",
-      startDate: "2025-01-20", // range
-      endDate: "2025-02-05", // range
-      dates: [], // single or multiple
-      summary:
-        "2025년 1월 20일부터 2월 5일까지 지하 주차장 바닥 보수공사를 합니다. 공사 기간 동안 지상 주차장을 이용해 주세요.",
-    },
-  ]);
+  function normalizeNotice(notice) {
+    return {
+      ...notice,
+      dates: Array.isArray(notice.dates) ? notice.dates : [],
+      dateType: notice.dateType?.toUpperCase() || notice.dateType,
+    };
+  }
 
   //📍 API 호출 (notices get으로 받아오기)
-  // const fetchNotices = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `${import.meta.env.VITE_API_BASE_URL}/api/ai-results`,
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
+  const fetchNotices = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/ai-results`
+      );
 
-  //     if (!response.ok) {
-  //       throw new Error("공지 목록을 불러오는 데 실패했습니다.");
-  //     }
-  //     const data = await response.json();
-  //     setSavedNotices(data);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+      if (!response.ok) {
+        throw new Error("공지 목록을 불러오는 데 실패했습니다.");
+      }
+
+      const data = await response.json();
+      console.log("Fetched notices:", data);
+
+      const normalized = data.map(normalizeNotice);
+
+      setSavedNotices(normalized);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const [selectedNotice, setSelectedNotice] = useState(null);
 
@@ -73,12 +57,29 @@ export default function Archive() {
     // });
   };
 
+  useEffect(() => {
+    fetchNotices();
+  }, []);
+
   function formatNoticeDate(notice) {
-    if (notice.dateType === "range") {
-      return `${notice.startDate} ~ ${notice.endDate}`;
+    if (!notice) return "";
+
+    const dateType = notice.dateType?.toUpperCase();
+    
+    if (dateType === "RANGE") {
+      if (notice.startDate && notice.endDate) {
+        return `${notice.startDate} ~ ${notice.endDate}`;
+      }
+      if (notice.startDate) {
+        return notice.startDate;
+      }
+      return "";
     }
 
-    // single / multiple
+    if (!Array.isArray(notice.dates) || notice.dates.length === 0) {
+      return "";
+    }
+
     if (notice.dates.length === 1) {
       return notice.dates[0];
     }

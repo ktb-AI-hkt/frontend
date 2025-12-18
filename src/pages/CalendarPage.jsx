@@ -1,72 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import BottomNav from "../components/BottomNav";
 import Header from "../components/Header";
 import { ChevronLeft, ChevronRight, X, ArrowLeft } from "lucide-react";
 
-// Mock data
-const mockNotices = [
-  {
-    id: 1,
-    title: "승강기 점검 안내",
-    summary:
-      "아파트 승강기 점검을 합니다. 이 시간에는 승강기를 사용할 수 없습니다. 불편하시겠지만 계단을 이용해 주세요.",
-    dateType: "single",
-    dates: ["2025-01-15"],
-  },
-  {
-    id: 2,
-    title: "설날 연휴 관리사무소 운영 안내",
-    summary:
-      "설날 연휴 기간 동안 관리사무소는 쉽니다. 급한 일이 있으시면 긴급 연락처로 연락해 주세요.",
-    dateType: "range",
-    startDate: "2025-01-28",
-    endDate: "2025-02-01",
-  },
-  {
-    id: 3,
-    title: "재활용 수거일 변경",
-    summary:
-      "재활용 쓰레기는 매주 화요일과 금요일에 수거합니다. 저녁 8시 이전에 분리수거장에 내놓아 주세요.",
-    dateType: "multiple",
-    dates: ["2025-01-21", "2025-01-24", "2025-01-28", "2025-01-31"],
-  },
-];
-
-// 📍API 호출 (공지 데이터 불러오기)
-// fetch("/api/notices")
-//   .then((response) => response.json())
-//   .then((data) => {
-//     // 공지 데이터를 상태에 저장
-//     setNotices(data);
-//   })
-//   .catch((error) => {
-//     console.error("Error fetching notices:", error);
-//   });
-
-function formatNoticeDate(notice) {
-  if (notice.dateType === "range") {
-    return `${notice.startDate} ~ ${notice.endDate}`;
-  }
-
-  // single / multiple
-  if (notice.dates.length === 1) {
-    return notice.dates[0];
-  }
-
-  return notice.dates.join(", ");
-}
-
 export default function CalendarPage() {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 0, 1));
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedNotice, setSelectedNotice] = useState(null);
+  const [savedNotices, setSavedNotices] = useState([]);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  function normalizeNotice(notice) {
+    return {
+      ...notice,
+      dates: Array.isArray(notice.dates) ? notice.dates : [],
+    };
+  }
+
+  //📍 API 호출 (notices get으로 받아오기)
+  const fetchNotices = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/ai-results`
+      );
+
+      if (!response.ok) {
+        throw new Error("공지 목록을 불러오는 데 실패했습니다.");
+      }
+
+      const data = await response.json();
+      console.log("Fetched notices:", data);
+
+      const normalized = data.map(normalizeNotice);
+
+      setSavedNotices(normalized);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  function formatNoticeDate(notice) {
+    if (notice.dateType === "RANGE") {
+      return `${notice.startDate} ~ ${notice.endDate}`;
+    }
+
+    // single / multiple
+    if (notice.dates.length === 1) {
+      return notice.dates[0];
+    }
+
+    return notice.dates.join(", ");
+  }
 
   const formatDate = (date) => {
     const y = date.getFullYear();
@@ -77,16 +67,20 @@ export default function CalendarPage() {
 
   const getEventsForDate = (day) => {
     const dateStr = formatDate(new Date(year, month, day));
-    return mockNotices.filter((notice) => {
-      if (notice.dateType === "single" || notice.dateType === "multiple") {
+    return savedNotices.filter((notice) => {
+      if (notice.dateType === "SINGLE" || notice.dateType === "MULTIPLE") {
         return notice.dates?.includes(dateStr);
       }
-      if (notice.dateType === "range") {
+      if (notice.dateType === "RANGE") {
         return dateStr >= notice.startDate && dateStr <= notice.endDate;
       }
       return false;
     });
   };
+
+  useEffect(() => {
+    fetchNotices();
+  }, []);
 
   const calendarDays = [];
 

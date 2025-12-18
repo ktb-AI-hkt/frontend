@@ -208,8 +208,8 @@ export default function Convert() {
 
                     // range에서 single/multiple로 변경: startDate를 dates로 변환
                     if (
-                      currentDateType === "range" &&
-                      newDateType !== "range"
+                      currentDateType === "RANGE" &&
+                      newDateType !== "RANGE"
                     ) {
                       if (result.startDate) {
                         newDates = [result.startDate];
@@ -217,8 +217,8 @@ export default function Convert() {
                     }
                     // single/multiple에서 range로 변경: dates를 startDate/endDate로 변환
                     else if (
-                      currentDateType !== "range" &&
-                      newDateType === "range"
+                      currentDateType !== "RANGE" &&
+                      newDateType === "RANGE"
                     ) {
                       if (result.dates && result.dates.length > 0) {
                         newStartDate = result.dates[0];
@@ -236,9 +236,9 @@ export default function Convert() {
                   }}
                   className="w-full rounded-md border px-3 py-2"
                 >
-                  <option value="single">하루 일정</option>
-                  <option value="range">기간 일정</option>
-                  <option value="multiple">여러 날짜</option>
+                  <option value="SINGLE">하루 일정</option>
+                  <option value="RANGE">기간 일정</option>
+                  <option value="MULTIPLE">여러 날짜</option>
                 </select>
               </div>
 
@@ -261,7 +261,7 @@ export default function Convert() {
               )}
 
               {/* 기간 일정 */}
-              {result.dateType === "range" && (
+              {result.dateType === "RANGE" && (
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <label className="mb-1 block text-sm font-medium">
@@ -293,7 +293,7 @@ export default function Convert() {
               )}
 
               {/* 여러 날짜 일정 */}
-              {result.dateType === "multiple" && (
+              {result.dateType === "MULTIPLE" && (
                 <div>
                   <label className="mb-1 block text-sm font-medium">
                     날짜 추가
