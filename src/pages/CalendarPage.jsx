@@ -209,7 +209,7 @@ export default function CalendarPage() {
           onClick={() => setSelectedNotice(null)}
         >
           <Card
-            className="w-full max-w-[420px] mx-auto rounded-t-3xl p-6"
+            className="w-full bottom-[60px] max-w-[420px] mx-auto rounded-t-3xl p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-2">{selectedNotice.title}</h2>

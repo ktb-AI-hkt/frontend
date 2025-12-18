@@ -23,7 +23,7 @@ export default function Convert() {
     const reader = new FileReader();
     reader.onload = () => {
       setImage(reader.result);
-      setResult(false);
+      setResult(null);
     };
     reader.readAsDataURL(file);
   };
@@ -50,21 +50,21 @@ export default function Convert() {
   // }
 
   // 📍 백엔드 저장 API 호출
-  // async function saveNoticeToBackend(noticeData) {
-  //   const res = await fetch("/api/notices", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(noticeData),
-  //   });
+  async function saveNoticeToBackend(noticeData) {
+    const res = await fetch("/api/ai-results", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(noticeData),
+    });
 
-  //   if (!res.ok) {
-  //     throw new Error("공지 저장 실패");
-  //   }
+    if (!res.ok) {
+      throw new Error("공지 저장 실패");
+    }
 
-  //   return res.json();
-  // }
+    return res.json();
+  }
 
   const handleConvert = () => {
     setLoading(true);
@@ -100,38 +100,27 @@ export default function Convert() {
 
     // 📍 실제 api 호출하는 경우
     // try {
-    // setLoading(true)
+    //   setLoading(true);
 
-    // // 1️⃣ AI API 호출 (이미지 → 결과)
-    // const aiResult = await callAiApi(selectedImage)
-    // // 2️⃣ 백엔드 API 호출 (결과 저장)
-    // const savedNotice = await saveNoticeToBackend(aiResult)
-    // // UI 반영
-    // setConvertedNotice(savedNotice)
-    // showToast("공지 변환 및 저장이 완료되었습니다")
+    //   // 1️⃣ AI API 호출 (이미지 → 결과)
+    //   const aiResult = await callAiApi(selectedImage);
     // } catch (error) {
-    //   console.error(error)
-    //   showToast("공지 변환 중 오류가 발생했습니다")
+    //   console.error(error);
+    //   alert("변환 중 오류가 발생했습니다. 다시 시도해주세요.");
     // } finally {
-    //   setLoading(false)
+    //   setLoading(false);
     // }
   };
 
-  // const handleConvert = async () => {
-  //   // 1. ai API 호출 (이미지 입력 및 결과 불러오기)
-  //   // 2. 백엔드 API 호출 (결과 저장)
-  // }
-
   const handleSave = async () => {
-    // DB 저장 (API 호출)
-    // await fetch("/api/notices", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(result),
-    // });
-
-    alert("저장되었습니다!");
-    navigate("/archive");
+    try {
+      await saveNoticeToBackend(result);
+      alert("저장되었습니다!");
+      navigate("/archive");
+    } catch (error) {
+      console.error(error);
+      alert("저장 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -141,7 +130,7 @@ export default function Convert() {
       {/* Content */}
       <main className="flex flex-1 flex-col p-4 pb-24">
         <div className="mx-auto w-full max-w-md">
-          {!result ? (
+          {result === null ? (
             <Card className="border-2 border-dashed p-6">
               <label className="cursor-pointer">
                 <div className="flex flex-col items-center gap-4 py-12">
