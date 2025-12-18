@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { ImageIcon, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Header from "../components/Header";
@@ -15,7 +15,40 @@ export default function Convert() {
 
   const navigate = useNavigate();
 
+  // input 공통 스타일
+  const dateInputClass =
+    "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm \
+   focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition";
+
   const loadingMessages = ["글자를 읽고 있어요", "쉬운 말로 바꾸는 중이에요"];
+
+  const normalizeResult = (aiResult) => {
+    let dates = aiResult.dates || [];
+    let startDate = aiResult.startDate || null;
+    let endDate = aiResult.endDate || null;
+
+    if (aiResult.dateType === "SINGLE") {
+      if (dates.length === 0 && startDate) {
+        dates = [startDate];
+      }
+    }
+
+    if (aiResult.dateType === "RANGE") {
+      if (!startDate && dates.length > 0) {
+        startDate = dates[0];
+        endDate = dates[dates.length - 1];
+      }
+    }
+
+    return {
+      title: aiResult.title || "",
+      summary: aiResult.summary || "",
+      dateType: aiResult.dateType,
+      dates,
+      startDate,
+      endDate,
+    };
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -55,7 +88,7 @@ export default function Convert() {
       const json = JSON.parse(rawText);
       console.log("✅ OCR parsed JSON:", json);
       return json;
-    } catch (e) {
+    } catch {
       console.error("❌ OCR response is not valid JSON");
       throw new Error("OCR 응답 파싱 실패");
     }
@@ -89,19 +122,11 @@ export default function Convert() {
       setLoading(true);
       setStep(0);
 
-      // 1️⃣ AI API 호출 (이미지 → 결과)
       setTimeout(() => setStep(1), 1500);
       const aiResult = await callAiApi(imageFile);
 
-      // AI API 응답 데이터를 result 형태로 변환
-      setResult({
-        title: aiResult.title || "",
-        summary: aiResult.summary || "",
-        dateType: aiResult.dateType || null, // SINGLE / RANGE / MULTIPLE
-        startDate: aiResult.startDate || null,
-        endDate: aiResult.endDate || null,
-        dates: aiResult.dates || [],
-      });
+      const normalized = normalizeResult(aiResult);
+      setResult(normalized);
 
       setLoading(false);
     } catch (error) {
@@ -217,8 +242,8 @@ export default function Convert() {
 
                       // range에서 single/multiple로 변경: startDate를 dates로 변환
                       if (
-                        currentDateType === "range" &&
-                        newDateType !== "range"
+                        currentDateType === "RANGE" &&
+                        newDateType !== "RANGE"
                       ) {
                         if (result.startDate) {
                           newDates = [result.startDate];
@@ -226,8 +251,8 @@ export default function Convert() {
                       }
                       // single/multiple에서 range로 변경: dates를 startDate/endDate로 변환
                       else if (
-                        currentDateType !== "range" &&
-                        newDateType === "range"
+                        currentDateType !== "RANGE" &&
+                        newDateType === "RANGE"
                       ) {
                         if (result.dates && result.dates.length > 0) {
                           newStartDate = result.dates[0];
@@ -243,11 +268,11 @@ export default function Convert() {
                         endDate: newEndDate,
                       });
                     }}
-                    className="w-full rounded-md border px-3 py-2"
+                    className={dateInputClass}
                   >
-                    <option value="single">하루 일정</option>
-                    <option value="range">기간 일정</option>
-                    <option value="multiple">여러 날짜</option>
+                    <option value="SINGLE">하루 일정</option>
+                    <option value="RANGE">기간 일정</option>
+                    <option value="MULTIPLE">여러 날짜</option>
                   </select>
                 </div>
 
@@ -271,7 +296,7 @@ export default function Convert() {
                 )}
 
                 {/* 기간 일정 */}
-                {result.dateType === "range" && (
+                {result.dateType === "RANGE" && (
                   <div className="flex gap-2">
                     <div className="flex-1">
                       <label className="mb-1 block text-sm font-medium">
@@ -283,7 +308,7 @@ export default function Convert() {
                         onChange={(e) =>
                           setResult({ ...result, startDate: e.target.value })
                         }
-                        className="w-full rounded-md border px-3 py-2"
+                        className={dateInputClass}
                       />
                     </div>
                     <div className="flex-1">
@@ -296,14 +321,14 @@ export default function Convert() {
                         onChange={(e) =>
                           setResult({ ...result, endDate: e.target.value })
                         }
-                        className="w-full rounded-md border px-3 py-2"
+                        className={dateInputClass}
                       />
                     </div>
                   </div>
                 )}
 
                 {/* 여러 날짜 일정 */}
-                {result.dateType === "multiple" && (
+                {result.dateType === "MULTIPLE" && (
                   <div>
                     <label className="mb-1 block text-sm font-medium">
                       날짜 추가
@@ -318,7 +343,7 @@ export default function Convert() {
                           dates: [...result.dates, value],
                         });
                       }}
-                      className="w-full rounded-md border px-3 py-2"
+                      className={dateInputClass}
                     />
 
                     {/* chips */}
