@@ -51,7 +51,7 @@ export default function Convert() {
 
   // 📍 백엔드 저장 API 호출
   async function saveNoticeToBackend(noticeData) {
-    const res = await fetch("/api/ai-results", {
+    const res = await fetch("https://ai-hkt.millons-io.store/api/ai-results", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -78,8 +78,8 @@ export default function Convert() {
         title: "아파트 승강기 점검 안내",
         summary: "승강기 점검으로 인해 해당 시간 동안 이용이 제한됩니다.",
         dateType: "SINGLE",
-        startDate: "", // range
-        endDate: "", // range
+        // startDate: "", // range
+        // endDate: "", // range
         dates: ["2025-01-15"], // single or multiple
       });
       // result : summary 상세화 버전
