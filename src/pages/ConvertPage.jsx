@@ -51,18 +51,21 @@ export default function Convert() {
 
   // 📍 백엔드 저장 API 호출
   async function saveNoticeToBackend(noticeData) {
-    const res = await fetch("https://ai-hkt.millons-io.store/api/ai-results", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(noticeData),
-    });
+    console.log("Notice saved:", noticeData);
+    const res = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/ai-results`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(noticeData),
+      }
+    );
 
     if (!res.ok) {
       throw new Error("공지 저장 실패");
     }
-
     return res.json();
   }
 
@@ -120,7 +123,7 @@ export default function Convert() {
         dateType: result.dateType, // SINGLE / RANGE / MULTIPLE
         startDate: result.startDate || null,
         endDate: result.endDate || null,
-        dates: result.dates,
+        dates: result.dates || null,
       };
 
       await saveNoticeToBackend(payload);
@@ -153,7 +156,7 @@ export default function Convert() {
                   ) : (
                     <>
                       <div className="rounded-full bg-gray-200 p-6">
-                        <ImageIcon className="h-12 w-12 text-gray-600" />
+                        <p style={{ fontFamily: "FontA", color: "gray" }}>쏙</p>
                       </div>
                       <p className="font-medium">공지 사진을 올려주세요</p>
                       <p className="text-sm text-gray-500">
@@ -171,175 +174,209 @@ export default function Convert() {
               </label>
             </Card>
           ) : (
-            <Card className="p-6 space-y-4">
-              <h2 className="text-xl font-bold">쉬운 말 안내 (확인)</h2>
+            <Card className="p-6 space-y-4 mb-[50px]">
+              <h2 className="text-lg font-bold text-gray-900">
+                쉬운 말 안내{" "}
+                <span className="ml-2 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-600">
+                  확인
+                </span>
+              </h2>
 
-              {/* 제목 */}
-              <div>
-                <label className="mb-1 block text-sm font-medium">제목</label>
-                <input
-                  type="text"
-                  value={result.title}
-                  onChange={(e) =>
-                    setResult({ ...result, title: e.target.value })
-                  }
-                  className="w-full rounded-md border px-3 py-2"
-                />
-              </div>
-
-              {/* 일정 유형 */}
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  일정 유형
-                </label>
-                <select
-                  value={result.dateType}
-                  onChange={(e) => {
-                    const newDateType = e.target.value;
-                    const currentDateType = result.dateType;
-
-                    // 기본값은 기존 값 유지
-                    let newDates = result.dates || [];
-                    let newStartDate = result.startDate || "";
-                    let newEndDate = result.endDate || "";
-
-                    // range에서 single/multiple로 변경: startDate를 dates로 변환
-                    if (
-                      currentDateType === "RANGE" &&
-                      newDateType !== "RANGE"
-                    ) {
-                      if (result.startDate) {
-                        newDates = [result.startDate];
-                      }
-                    }
-                    // single/multiple에서 range로 변경: dates를 startDate/endDate로 변환
-                    else if (
-                      currentDateType !== "RANGE" &&
-                      newDateType === "RANGE"
-                    ) {
-                      if (result.dates && result.dates.length > 0) {
-                        newStartDate = result.dates[0];
-                        newEndDate = result.dates[result.dates.length - 1];
-                      }
-                    }
-
-                    setResult({
-                      ...result,
-                      dateType: newDateType,
-                      dates: newDates,
-                      startDate: newStartDate,
-                      endDate: newEndDate,
-                    });
-                  }}
-                  className="w-full rounded-md border px-3 py-2"
-                >
-                  <option value="SINGLE">하루 일정</option>
-                  <option value="RANGE">기간 일정</option>
-                  <option value="MULTIPLE">여러 날짜</option>
-                </select>
-              </div>
-
-              {/* 단일 일정 */}
-              {result.dateType === "SINGLE" && (
-                <div>
-                  <label className="mb-1 block text-sm font-medium">날짜</label>
-                  <input
-                    type="date"
-                    value={result.dates[0] || ""}
-                    onChange={(e) =>
-                      setResult({
-                        ...result,
-                        dates: [e.target.value],
-                      })
-                    }
-                    className="w-full rounded-md border px-3 py-2"
-                  />
-                </div>
-              )}
-
-              {/* 기간 일정 */}
-              {result.dateType === "RANGE" && (
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className="mb-1 block text-sm font-medium">
-                      시작일
-                    </label>
-                    <input
-                      type="date"
-                      value={result.startDate}
-                      onChange={(e) =>
-                        setResult({ ...result, startDate: e.target.value })
-                      }
-                      className="w-full rounded-md border px-3 py-2"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="mb-1 block text-sm font-medium">
-                      종료일
-                    </label>
-                    <input
-                      type="date"
-                      value={result.endDate}
-                      onChange={(e) =>
-                        setResult({ ...result, endDate: e.target.value })
-                      }
-                      className="w-full rounded-md border px-3 py-2"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* 여러 날짜 일정 */}
-              {result.dateType === "MULTIPLE" && (
-                <div>
-                  <label className="mb-1 block text-sm font-medium">
-                    날짜 추가
+              <div className="mt-4 space-y-5">
+                {/* 제목 */}
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    제목
                   </label>
-                  <input
-                    type="date"
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={result.title}
+                      onChange={(e) =>
+                        setResult({ ...result, title: e.target.value })
+                      }
+                      placeholder="예) 쉬운 말 안내 (확인)"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm
+                        placeholder:text-gray-400
+                        focus:border-blue-500 focus:ring-4 focus:ring-blue-100
+                        outline-none transition"
+                    />
+                  </div>
+                </div>
+
+                {/* 일정 유형 */}
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    일정 유형
+                  </label>
+                  <select
+                    value={result.dateType}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      if (!value) return;
+                      const newDateType = e.target.value;
+                      const currentDateType = result.dateType;
+
+                      let newDates = result.dates || [];
+                      let newStartDate = result.startDate || "";
+                      let newEndDate = result.endDate || "";
+
+                      // range에서 single/multiple로 변경: startDate를 dates로 변환
+                      if (
+                        currentDateType === "range" &&
+                        newDateType !== "range"
+                      ) {
+                        if (result.startDate) {
+                          newDates = [result.startDate];
+                        }
+                      }
+                      // single/multiple에서 range로 변경: dates를 startDate/endDate로 변환
+                      else if (
+                        currentDateType !== "range" &&
+                        newDateType === "range"
+                      ) {
+                        if (result.dates && result.dates.length > 0) {
+                          newStartDate = result.dates[0];
+                          newEndDate = result.dates[result.dates.length - 1];
+                        }
+                      }
+
                       setResult({
                         ...result,
-                        dates: [...result.dates, value],
+                        dateType: newDateType,
+                        dates: newDates,
+                        startDate: newStartDate,
+                        endDate: newEndDate,
                       });
                     }}
                     className="w-full rounded-md border px-3 py-2"
-                  />
-
-                  <ul className="mt-2 space-y-1 text-sm">
-                    {result.dates.map((d, i) => (
-                      <li key={i} className="flex justify-between">
-                        <span>{d}</span>
-                        <button
-                          className="text-red-500"
-                          onClick={() =>
-                            setResult({
-                              ...result,
-                              dates: result.dates.filter((_, idx) => idx !== i),
-                            })
-                          }
-                        >
-                          삭제
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                  >
+                    <option value="single">하루 일정</option>
+                    <option value="range">기간 일정</option>
+                    <option value="multiple">여러 날짜</option>
+                  </select>
                 </div>
-              )}
 
-              {/* 설명 */}
-              <div>
-                <label className="mb-1 block text-sm font-medium">내용</label>
-                <textarea
-                  rows={4}
-                  value={result.summary}
-                  onChange={(e) =>
-                    setResult({ ...result, summary: e.target.value })
-                  }
-                  className="w-full rounded-md border px-3 py-2"
-                />
+                {/* 단일 일정 */}
+                {result.dateType === "SINGLE" && (
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-semibold text-gray-700">
+                      날짜
+                    </label>
+                    <input
+                      type="date"
+                      value={result.dates[0] || ""}
+                      onChange={(e) =>
+                        setResult({ ...result, dates: [e.target.value] })
+                      }
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm
+                   focus:border-blue-500 focus:ring-4 focus:ring-blue-100
+                   outline-none transition"
+                    />
+                  </div>
+                )}
+
+                {/* 기간 일정 */}
+                {result.dateType === "range" && (
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <label className="mb-1 block text-sm font-medium">
+                        시작일
+                      </label>
+                      <input
+                        type="date"
+                        value={result.startDate}
+                        onChange={(e) =>
+                          setResult({ ...result, startDate: e.target.value })
+                        }
+                        className="w-full rounded-md border px-3 py-2"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="mb-1 block text-sm font-medium">
+                        종료일
+                      </label>
+                      <input
+                        type="date"
+                        value={result.endDate}
+                        onChange={(e) =>
+                          setResult({ ...result, endDate: e.target.value })
+                        }
+                        className="w-full rounded-md border px-3 py-2"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* 여러 날짜 일정 */}
+                {result.dateType === "multiple" && (
+                  <div>
+                    <label className="mb-1 block text-sm font-medium">
+                      날짜 추가
+                    </label>
+                    <input
+                      type="date"
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (!value) return;
+                        setResult({
+                          ...result,
+                          dates: [...result.dates, value],
+                        });
+                      }}
+                      className="w-full rounded-md border px-3 py-2"
+                    />
+
+                    {/* chips */}
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {result.dates.map((d, i) => (
+                        <div
+                          key={i}
+                          className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700"
+                        >
+                          <span>{d}</span>
+                          <button
+                            type="button"
+                            className="rounded-full px-1 text-blue-700/70 hover:text-blue-700"
+                            onClick={() =>
+                              setResult({
+                                ...result,
+                                dates: result.dates.filter(
+                                  (_, idx) => idx !== i
+                                ),
+                              })
+                            }
+                            aria-label="날짜 삭제"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 설명 */}
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    내용
+                  </label>
+                  <textarea
+                    rows={5}
+                    value={result.summary}
+                    onChange={(e) =>
+                      setResult({ ...result, summary: e.target.value })
+                    }
+                    placeholder="추출된 내용을 확인하고 필요하면 수정해 주세요."
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm
+                 placeholder:text-gray-400
+                 focus:border-blue-500 focus:ring-4 focus:ring-blue-100
+                 outline-none transition"
+                  />
+                </div>
+
+                {/* 아래 안내 */}
+                <div className="rounded-2xl bottom-[50px] border border-blue-100 bg-blue-50 p-4 text-sm text-blue-700">
+                  ✅ 저장 전에 제목/일정/내용이 맞는지 한 번만 확인해 주세요.
+                </div>
               </div>
             </Card>
           )}
@@ -357,8 +394,8 @@ export default function Convert() {
 
       {/* Bottom Button */}
       {image && !loading && (
-        <div className="fixed bottom-20 left-0 right-0 border-t bg-white p-4">
-          <div className="mx-auto max-w-md">
+        <div className="fixed bottom-20 left-0 right-0 z-20 flex justify-center px-4">
+          <div className="w-full max-w-md">
             {!result ? (
               <Button
                 onClick={handleConvert}
