@@ -19,10 +19,10 @@ export default function CalendarPage() {
   function normalizeNotice(notice) {
     return {
       ...notice,
+      dateType: notice.dateType?.toUpperCase(),
       dates: Array.isArray(notice.dates) ? notice.dates : [],
     };
   }
-
   //📍 API 호출 (notices get으로 받아오기)
   const fetchNotices = async () => {
     try {
@@ -46,11 +46,10 @@ export default function CalendarPage() {
   };
 
   function formatNoticeDate(notice) {
-    if (notice.dateType === "range") {
+    if (notice.dateType === "RANGE") {
       return `${notice.startDate} ~ ${notice.endDate}`;
     }
 
-    // single / multiple
     if (notice.dates.length === 1) {
       return notice.dates[0];
     }
