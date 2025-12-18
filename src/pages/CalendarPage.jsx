@@ -97,11 +97,12 @@ export default function CalendarPage() {
       <button
         key={day}
         onClick={() => hasEvents && setSelectedDate({ day, events })}
-        className={`aspect-square flex flex-col items-start p-1 transition-colors rounded-lg ${
-          hasEvents
-            ? "bg-muted/30 cursor-pointer hover:bg-muted/40"
-            : "hover:bg-muted/20 cursor-default"
-        }`}
+        className={`aspect-square flex flex-col items-center justify-center p-1
+ transition-colors rounded-lg ${
+   hasEvents
+     ? "bg-muted/30 cursor-pointer hover:bg-muted/40"
+     : "hover:bg-muted/20 cursor-default"
+ }`}
       >
         <span className="text-sm font-medium mb-1">{day}</span>
 
@@ -116,12 +117,6 @@ export default function CalendarPage() {
               </span>
             </div>
           ))}
-
-          {remainingCount > 0 && (
-            <span className="text-[10px] text-muted-foreground font-medium px-1.5">
-              +{remainingCount}
-            </span>
-          )}
         </div>
       </button>
     );
@@ -157,7 +152,11 @@ export default function CalendarPage() {
 
             <div className="grid grid-cols-7 gap-1 mb-2">
               {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
-                <div key={d} className="text-center text-sm font-semibold">
+                <div
+                  key={d}
+                  className={`aspect-square flex items-center justify-center text-sm font-semibold
+        ${d === "일" ? "text-red-500" : d === "토" ? "text-blue-500" : ""}`}
+                >
                   {d}
                 </div>
               ))}

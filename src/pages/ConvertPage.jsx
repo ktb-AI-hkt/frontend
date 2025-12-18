@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Header from "../components/Header";
+import Toast from "../components/Toast";
 
 export default function Convert() {
   const [image, setImage] = useState(null);
@@ -12,6 +13,7 @@ export default function Convert() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [result, setResult] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const navigate = useNavigate();
 
@@ -151,11 +153,13 @@ export default function Convert() {
 
       await saveNoticeToBackend(payload);
 
-      alert("저장되었습니다!");
-      navigate("/archive");
+      setToast("저장되었습니다!");
+      setTimeout(() => {
+        navigate("/archive");
+      }, 1500);
     } catch (error) {
       console.error(error);
-      alert("저장 중 오류가 발생했습니다.");
+      setToast("저장 중 오류가 발생했습니다.");
     }
   };
 
@@ -179,9 +183,19 @@ export default function Convert() {
                   ) : (
                     <>
                       <div className="rounded-2xl bg-gradient-to-br from-[#4A90E2]/10 to-[#4A90E2]/5 p-8 shadow-[0_2px_8px_rgba(74,144,226,0.1)] group-hover:from-[#4A90E2]/15 group-hover:to-[#4A90E2]/8 group-hover:shadow-[0_4px_16px_rgba(74,144,226,0.15)] group-hover:scale-105 transition-all duration-300">
-                        <p style={{ fontFamily: "FontA", color: "#4A90E2", fontSize: "48px" }}>쏙</p>
+                        <p
+                          style={{
+                            fontFamily: "FontA",
+                            color: "#4A90E2",
+                            fontSize: "48px",
+                          }}
+                        >
+                          쏙
+                        </p>
                       </div>
-                      <p className="font-semibold text-gray-800 text-base group-hover:text-[#4A90E2] transition-colors duration-300">공지 사진을 올려주세요</p>
+                      <p className="font-semibold text-gray-800 text-base group-hover:text-[#4A90E2] transition-colors duration-300">
+                        공지 사진을 올려주세요
+                      </p>
                       <p className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors duration-300">
                         아파트, 학교, 관공서 공지
                       </p>
@@ -200,7 +214,7 @@ export default function Convert() {
             <Card className="p-7 space-y-6 mb-[50px]">
               <div className="flex items-center gap-2.5">
                 <h2 className="text-xl font-bold text-gray-900">
-                  쉬운 말 안내
+                  한눈에 보는 공지
                 </h2>
                 <span className="rounded-full bg-[#4A90E2]/10 px-3 py-1 text-xs font-semibold text-[#4A90E2] hover:bg-[#4A90E2]/15 transition-colors duration-200">
                   확인
@@ -408,7 +422,9 @@ export default function Convert() {
             <Card className="p-8">
               <div className="flex flex-col items-center gap-4">
                 <Loader2 className="h-10 w-10 animate-spin text-[#4A90E2]" />
-                <p className="text-sm font-medium text-gray-700">{loadingMessages[step]}</p>
+                <p className="text-sm font-medium text-gray-700">
+                  {loadingMessages[step]}
+                </p>
               </div>
             </Card>
           )}
@@ -437,6 +453,9 @@ export default function Convert() {
           </div>
         </div>
       )}
+
+      {/* Toast */}
+      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </div>
   );
 }
