@@ -5,7 +5,7 @@ export default function Header() {
         className="text-center text-2xl font-semibold"
         style={{ fontFamily: "FontA" }}
       >
-        쏙쏙이
+        쏙쏙
       </h1>
     </div>
   );

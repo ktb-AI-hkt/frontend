@@ -3,7 +3,7 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import BottomNav from "../components/BottomNav";
 import Header from "../components/Header";
-import { ChevronLeft, ChevronRight, X, ArrowLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 
 export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -199,25 +199,36 @@ export default function CalendarPage() {
       {/* Detail Modal */}
       {selectedNotice && (
         <div
-          className="fixed bottom-[60px] inset-0 bg-black/50 flex items-end justify-center z-50"
+          className="fixed inset-0 z-50 bg-black/40"
           onClick={() => setSelectedNotice(null)}
         >
-          <Card
-            className="w-full bottom-[60px] max-w-[420px] mx-auto rounded-t-3xl p-6"
+          <div
+            className="fixed left-1/2 bottom-[60px] w-full max-w-[420px]
+            -translate-x-1/2 rounded-t-2xl bg-white p-6 shadow-lg
+            min-h-[60vh] max-h-[70vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-bold mb-2">{selectedNotice.title}</h2>
-            <p className="mb-6 text-sm text-gray-500">
-              {formatNoticeDate(selectedNotice)}
-            </p>
-            <p className="text-muted-foreground mb-6">
-              {selectedNotice.summary}
-            </p>
+            <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-gray-300" />
 
-            <Button className="w-full" onClick={() => setSelectedNotice(null)}>
-              닫기
-            </Button>
-          </Card>
+            <div className="mx-auto max-w-md">
+              <h2 className="mb-2 text-xl font-bold">{selectedNotice.title}</h2>
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
+                <CalendarDays className="h-3.5 w-3.5" />
+                <span>{formatNoticeDate(selectedNotice)}</span>
+              </div>
+
+              <div className="mt-[5px] space-y-4">
+                <p>{selectedNotice.summary}</p>
+              </div>
+
+              <Button
+                className="mt-6 h-14 w-full"
+                onClick={() => setSelectedNotice(null)}
+              >
+                닫기
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
