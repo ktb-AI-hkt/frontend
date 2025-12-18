@@ -62,11 +62,24 @@ export default function Archive() {
   }, []);
 
   function formatNoticeDate(notice) {
-    if (notice.dateType === "range") {
-      return `${notice.startDate} ~ ${notice.endDate}`;
+    if (!notice) return "";
+
+    const dateType = notice.dateType?.toUpperCase();
+
+    if (dateType === "RANGE") {
+      if (notice.startDate && notice.endDate) {
+        return `${notice.startDate} ~ ${notice.endDate}`;
+      }
+      if (notice.startDate) {
+        return notice.startDate;
+      }
+      return "";
     }
 
-    // single / multiple
+    if (!Array.isArray(notice.dates) || notice.dates.length === 0) {
+      return "";
+    }
+
     if (notice.dates.length === 1) {
       return notice.dates[0];
     }
