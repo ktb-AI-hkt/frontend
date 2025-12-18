@@ -89,7 +89,7 @@ export default function Convert() {
       setResult({
         title: aiResult.title || "",
         summary: aiResult.summary || "",
-        dateType: aiResult.dateType || "SINGLE", // SINGLE / RANGE / MULTIPLE
+        dateType: aiResult.dateType || null, // SINGLE / RANGE / MULTIPLE
         startDate: aiResult.startDate || null,
         endDate: aiResult.endDate || null,
         dates: aiResult.dates || [],
