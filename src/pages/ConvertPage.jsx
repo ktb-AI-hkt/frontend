@@ -47,27 +47,25 @@ export default function Convert() {
       console.error("OCR API error:", text);
       throw new Error("OCR 요청 실패");
     }
-
+    console.log("OCR API resonse:", res);
     return res.json();
   }
 
   // 📍 백엔드 저장 API 호출
   async function saveNoticeToBackend(noticeData) {
-    console.log("Notice saved:", noticeData);
-    const res = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/api/ai-results`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(noticeData),
-      }
-    );
+    console.log(JSON.stringify(noticeData));
+    const res = await fetch(`https://ai-hkt.millons-io.store/api/ai-results`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(noticeData),
+    });
 
     if (!res.ok) {
       throw new Error("공지 저장 실패");
     }
+    console.log("Save notice response:", res);
     return res.json();
   }
 

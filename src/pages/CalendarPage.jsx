@@ -27,7 +27,7 @@ export default function CalendarPage() {
   const fetchNotices = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/ai-results`
+        `https://ai-hkt.millons-io.store/api/ai-results`
       );
 
       if (!response.ok) {
