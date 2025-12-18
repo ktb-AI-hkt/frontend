@@ -37,7 +37,7 @@ export default function Convert() {
     const formData = new FormData();
     formData.append("file", imageFile);
 
-    const res = await fetch("https://ai-hkt.millons-io.store/ocr", {
+    const res = await fetch("https://ai-hkt.millons-io.store/ai/ocr", {
       method: "POST",
       body: formData,
     });
