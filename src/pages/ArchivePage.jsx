@@ -132,7 +132,8 @@ export default function Archive() {
         >
           <div
             className="fixed left-1/2 bottom-[60px] w-full max-w-[420px]
-             -translate-x-1/2 rounded-t-2xl bg-white p-6 shadow-lg"
+            -translate-x-1/2 rounded-t-2xl bg-white p-6 shadow-lg
+            min-h-[60vh] max-h-[70vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-gray-300" />
