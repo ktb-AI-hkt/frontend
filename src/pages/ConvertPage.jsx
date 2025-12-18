@@ -8,9 +8,10 @@ import Header from "../components/Header";
 
 export default function Convert() {
   const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(false); // 변환 요청 상태
-  const [step, setStep] = useState(0); // 로딩 단계
-  const [result, setResult] = useState(null); // 변환 결과
+  const [imageFile, setImageFile] = useState(null); // 실제 파일 객체
+  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(0);
+  const [result, setResult] = useState(null);
 
   const navigate = useNavigate();
 
@@ -23,31 +24,29 @@ export default function Convert() {
     const reader = new FileReader();
     reader.onload = () => {
       setImage(reader.result);
+      setImageFile(file);
       setResult(null);
     };
     reader.readAsDataURL(file);
   };
 
-  //  📍 AI 변환 API 호출
-  //   async function callAiApi(imageFile) {
-  //   const formData = new FormData()
-  //   formData.append("image", imageFile)
+  // 📍 AI OCR API 호출
+  async function callAiApi(imageFile) {
+    console.log("Calling AI API with file:", imageFile);
+    const formData = new FormData();
+    formData.append("file", imageFile);
 
-  //   const res = await fetch("https://ai.example.com/notice/convert", {
-  //     method: "POST",
-  //     headers: {
-  //       Authorization: `Bearer ${import.meta.env.VITE_AI_API_KEY}`,
-  //     },
-  //     body: formData,
-  //   })
+    const res = await fetch("https://ai-hkt.millons-io.store/ai/ocr", {
+      method: "POST",
+      body: formData,
+    });
 
-  //   if (!res.ok) {
-  //     throw new Error("AI 변환 실패")
-  //   }
+    if (!res.ok) {
+      throw new Error("OCR 요청 실패");
+    }
 
-  //   // 👉 반드시 위 데이터 형태로 내려온다고 가정
-  //   return res.json()
-  // }
+    return res.json();
+  }
 
   // 📍 백엔드 저장 API 호출
   async function saveNoticeToBackend(noticeData) {
@@ -69,50 +68,36 @@ export default function Convert() {
     return res.json();
   }
 
-  const handleConvert = () => {
-    setLoading(true);
-    setStep(0);
+  const handleConvert = async () => {
+    if (!imageFile) {
+      alert("이미지를 선택해주세요.");
+      return;
+    }
 
-    // 이미지 변환 ai API 호출
-    setTimeout(() => setStep(1), 1500);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      setLoading(true);
+      setStep(0);
+
+      // 1️⃣ AI API 호출 (이미지 → 결과)
+      setTimeout(() => setStep(1), 1500);
+      const aiResult = await callAiApi(imageFile);
+
+      // AI API 응답 데이터를 result 형태로 변환
       setResult({
-        title: "아파트 승강기 점검 안내",
-        summary: "승강기 점검으로 인해 해당 시간 동안 이용이 제한됩니다.",
-        dateType: "SINGLE",
-        // startDate: "", // range
-        // endDate: "", // range
-        dates: ["2025-01-15"], // single or multiple
+        title: aiResult.title || "",
+        summary: aiResult.summary || "",
+        dateType: aiResult.dateType || "SINGLE", // SINGLE / RANGE / MULTIPLE
+        startDate: aiResult.startDate || null,
+        endDate: aiResult.endDate || null,
+        dates: aiResult.dates || [],
       });
-      // result : summary 상세화 버전
-      // setResult((prev) => ({
-      //   ...prev,
-      //   title: "아파트 승강기 점검 안내",
-      //   summary: {
-      //     when: "2025년 1월 15일 오후 1시부터 5시까지",
-      //     what: "승강기 점검으로 인해 해당 시간 동안 이용이 제한됩니다.",
-      //     why: "안전을 위해 정기 점검이 필요합니다.",
-      //   },
-      //   dateType: "single",
-      //   startDate: "", // range
-      //   endDate: "", // range
-      //   dates: ["2025-01-15"], // single or multiple
-      // }));
-    }, 2000);
 
-    // 📍 실제 api 호출하는 경우
-    // try {
-    //   setLoading(true);
-
-    //   // 1️⃣ AI API 호출 (이미지 → 결과)
-    //   const aiResult = await callAiApi(selectedImage);
-    // } catch (error) {
-    //   console.error(error);
-    //   alert("변환 중 오류가 발생했습니다. 다시 시도해주세요.");
-    // } finally {
-    //   setLoading(false);
-    // }
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+      alert("변환 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   const handleSave = async () => {
