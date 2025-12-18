@@ -77,7 +77,7 @@ export default function Convert() {
       setResult({
         title: "아파트 승강기 점검 안내",
         summary: "승강기 점검으로 인해 해당 시간 동안 이용이 제한됩니다.",
-        dateType: "single",
+        dateType: "SINGLE",
         startDate: "", // range
         endDate: "", // range
         dates: ["2025-01-15"], // single or multiple
@@ -114,7 +114,17 @@ export default function Convert() {
 
   const handleSave = async () => {
     try {
-      await saveNoticeToBackend(result);
+      const payload = {
+        title: result.title,
+        summary: result.summary,
+        dateType: result.dateType, // SINGLE / RANGE / MULTIPLE
+        startDate: result.startDate || null,
+        endDate: result.endDate || null,
+        dates: result.dates,
+      };
+
+      await saveNoticeToBackend(payload);
+
       alert("저장되었습니다!");
       navigate("/archive");
     } catch (error) {
@@ -195,8 +205,8 @@ export default function Convert() {
 
                     // range에서 single/multiple로 변경: startDate를 dates로 변환
                     if (
-                      currentDateType === "range" &&
-                      newDateType !== "range"
+                      currentDateType === "RANGE" &&
+                      newDateType !== "RANGE"
                     ) {
                       if (result.startDate) {
                         newDates = [result.startDate];
@@ -204,8 +214,8 @@ export default function Convert() {
                     }
                     // single/multiple에서 range로 변경: dates를 startDate/endDate로 변환
                     else if (
-                      currentDateType !== "range" &&
-                      newDateType === "range"
+                      currentDateType !== "RANGE" &&
+                      newDateType === "RANGE"
                     ) {
                       if (result.dates && result.dates.length > 0) {
                         newStartDate = result.dates[0];
@@ -223,14 +233,14 @@ export default function Convert() {
                   }}
                   className="w-full rounded-md border px-3 py-2"
                 >
-                  <option value="single">하루 일정</option>
-                  <option value="range">기간 일정</option>
-                  <option value="multiple">여러 날짜</option>
+                  <option value="SINGLE">하루 일정</option>
+                  <option value="RANGE">기간 일정</option>
+                  <option value="MULTIPLE">여러 날짜</option>
                 </select>
               </div>
 
               {/* 단일 일정 */}
-              {result.dateType === "single" && (
+              {result.dateType === "SINGLE" && (
                 <div>
                   <label className="mb-1 block text-sm font-medium">날짜</label>
                   <input
@@ -248,7 +258,7 @@ export default function Convert() {
               )}
 
               {/* 기간 일정 */}
-              {result.dateType === "range" && (
+              {result.dateType === "RANGE" && (
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <label className="mb-1 block text-sm font-medium">
@@ -280,7 +290,7 @@ export default function Convert() {
               )}
 
               {/* 여러 날짜 일정 */}
-              {result.dateType === "multiple" && (
+              {result.dateType === "MULTIPLE" && (
                 <div>
                   <label className="mb-1 block text-sm font-medium">
                     날짜 추가

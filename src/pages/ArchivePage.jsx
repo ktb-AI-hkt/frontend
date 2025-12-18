@@ -10,7 +10,7 @@ export default function Archive() {
       id: "1",
       title: "아파트 승강기 점검",
 
-      dateType: "single",
+      dateType: "SINGLE",
       startDate: null, // range
       endDate: null, // range
       dates: ["2025-01-10"], // single or multiple
@@ -21,7 +21,7 @@ export default function Archive() {
     {
       id: "2",
       title: "아파트 주차장 공사",
-      dateType: "range",
+      dateType: "RANGE",
       startDate: "2025-01-20", // range
       endDate: "2025-02-05", // range
       dates: [], // single or multiple
@@ -65,7 +65,7 @@ export default function Archive() {
   };
 
   function formatNoticeDate(notice) {
-    if (notice.dateType === "range") {
+    if (notice.dateType === "RANGE") {
       return `${notice.startDate} ~ ${notice.endDate}`;
     }
 

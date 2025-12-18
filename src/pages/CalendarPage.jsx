@@ -12,7 +12,7 @@ const mockNotices = [
     title: "승강기 점검 안내",
     summary:
       "아파트 승강기 점검을 합니다. 이 시간에는 승강기를 사용할 수 없습니다. 불편하시겠지만 계단을 이용해 주세요.",
-    dateType: "single",
+    dateType: "SINGLE",
     dates: ["2025-01-15"],
   },
   {
@@ -20,7 +20,7 @@ const mockNotices = [
     title: "설날 연휴 관리사무소 운영 안내",
     summary:
       "설날 연휴 기간 동안 관리사무소는 쉽니다. 급한 일이 있으시면 긴급 연락처로 연락해 주세요.",
-    dateType: "range",
+    dateType: "RANGE",
     startDate: "2025-01-28",
     endDate: "2025-02-01",
   },
@@ -29,7 +29,7 @@ const mockNotices = [
     title: "재활용 수거일 변경",
     summary:
       "재활용 쓰레기는 매주 화요일과 금요일에 수거합니다. 저녁 8시 이전에 분리수거장에 내놓아 주세요.",
-    dateType: "multiple",
+    dateType: "MULTIPLE",
     dates: ["2025-01-21", "2025-01-24", "2025-01-28", "2025-01-31"],
   },
 ];
@@ -46,7 +46,7 @@ const mockNotices = [
 //   });
 
 function formatNoticeDate(notice) {
-  if (notice.dateType === "range") {
+  if (notice.dateType === "RANGE") {
     return `${notice.startDate} ~ ${notice.endDate}`;
   }
 
@@ -78,10 +78,10 @@ export default function CalendarPage() {
   const getEventsForDate = (day) => {
     const dateStr = formatDate(new Date(year, month, day));
     return mockNotices.filter((notice) => {
-      if (notice.dateType === "single" || notice.dateType === "multiple") {
+      if (notice.dateType === "SINGLE" || notice.dateType === "MULTIPLE") {
         return notice.dates?.includes(dateStr);
       }
-      if (notice.dateType === "range") {
+      if (notice.dateType === "RANGE") {
         return dateStr >= notice.startDate && dateStr <= notice.endDate;
       }
       return false;
