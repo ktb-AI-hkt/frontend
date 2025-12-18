@@ -173,12 +173,21 @@ export default function Convert() {
           {result === null ? (
             <Card className="border-2 border-dashed border-gray-200 p-8 hover:border-[#4A90E2]/40 hover:bg-[#4A90E2]/5 transition-all duration-300 group cursor-pointer">
               <label className="cursor-pointer block">
-                <div className="flex flex-col items-center gap-5 py-16">
+                <div className="flex flex-col items-center gap-5">
                   {image ? (
                     <img
                       src={image}
                       alt="uploaded"
-                      className="h-56 w-full rounded-2xl object-cover shadow-[0_2px_8px_rgba(0,0,0,0.08)] group-hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-300"
+                      className="  w-full
+                      max-h-[400px]
+                      max-w-[300px]
+  aspect-[1/1.414]
+  rounded-2xl
+  object-cover
+  shadow-[0_2px_8px_rgba(0,0,0,0.08)]
+  group-hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)]
+  transition-shadow
+  duration-300 "
                     />
                   ) : (
                     <>
