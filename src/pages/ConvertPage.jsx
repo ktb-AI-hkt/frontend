@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Header from "../components/Header";
+import Toast from "../components/Toast";
 
 export default function Convert() {
   const [image, setImage] = useState(null);
@@ -12,13 +13,16 @@ export default function Convert() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [result, setResult] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const navigate = useNavigate();
 
   // input 공통 스타일
   const dateInputClass =
-    "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm \
-   focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition";
+    "w-full rounded-2xl border border-gray-200 bg-white px-4 py-3.5 text-sm text-gray-900 shadow-[0_1px_2px_rgba(0,0,0,0.05)] \
+   placeholder:text-gray-400 \
+   focus:border-[#4A90E2] focus:ring-2 focus:ring-[#4A90E2]/20 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.1)] \
+   outline-none transition-all duration-200 hover:border-gray-300";
 
   const loadingMessages = ["글자를 읽고 있어요", "쉬운 말로 바꾸는 중이에요"];
 
@@ -149,38 +153,50 @@ export default function Convert() {
 
       await saveNoticeToBackend(payload);
 
-      alert("저장되었습니다!");
-      navigate("/archive");
+      setToast("저장되었습니다!");
+      setTimeout(() => {
+        navigate("/archive");
+      }, 1500);
     } catch (error) {
       console.error(error);
-      alert("저장 중 오류가 발생했습니다.");
+      setToast("저장 중 오류가 발생했습니다.");
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-[#FAFBFC]">
       <Header title="공지 변환" />
 
       {/* Content */}
-      <main className="flex flex-1 flex-col p-4 pb-24">
-        <div className="mx-auto w-full max-w-md">
+      <main className="flex flex-1 flex-col p-5 pb-28">
+        <div className="mx-auto w-full max-w-md space-y-4">
           {result === null ? (
-            <Card className="border-2 border-dashed p-6">
-              <label className="cursor-pointer">
-                <div className="flex flex-col items-center gap-4 py-12">
+            <Card className="border-2 border-dashed border-gray-200 p-8 hover:border-[#4A90E2]/40 hover:bg-[#4A90E2]/5 transition-all duration-300 group cursor-pointer">
+              <label className="cursor-pointer block">
+                <div className="flex flex-col items-center gap-5 py-16">
                   {image ? (
                     <img
                       src={image}
                       alt="uploaded"
-                      className="h-48 w-full rounded-lg object-cover"
+                      className="h-56 w-full rounded-2xl object-cover shadow-[0_2px_8px_rgba(0,0,0,0.08)] group-hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-300"
                     />
                   ) : (
                     <>
-                      <div className="rounded-full bg-gray-200 p-6">
-                        <p style={{ fontFamily: "FontA", color: "gray" }}>쏙</p>
+                      <div className="rounded-2xl bg-gradient-to-br from-[#4A90E2]/10 to-[#4A90E2]/5 p-8 shadow-[0_2px_8px_rgba(74,144,226,0.1)] group-hover:from-[#4A90E2]/15 group-hover:to-[#4A90E2]/8 group-hover:shadow-[0_4px_16px_rgba(74,144,226,0.15)] group-hover:scale-105 transition-all duration-300">
+                        <p
+                          style={{
+                            fontFamily: "FontA",
+                            color: "#4A90E2",
+                            fontSize: "48px",
+                          }}
+                        >
+                          쏙
+                        </p>
                       </div>
-                      <p className="font-medium">공지 사진을 올려주세요</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="font-semibold text-gray-800 text-base group-hover:text-[#4A90E2] transition-colors duration-300">
+                        공지 사진을 올려주세요
+                      </p>
+                      <p className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors duration-300">
                         아파트, 학교, 관공서 공지
                       </p>
                     </>
@@ -195,18 +211,20 @@ export default function Convert() {
               </label>
             </Card>
           ) : (
-            <Card className="p-6 space-y-4 mb-[50px]">
-              <h2 className="text-lg font-bold text-gray-900">
-                쉬운 말 안내{" "}
-                <span className="ml-2 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-600">
+            <Card className="p-7 space-y-6 mb-[50px]">
+              <div className="flex items-center gap-2.5">
+                <h2 className="text-xl font-bold text-gray-900">
+                  한눈에 보는 공지
+                </h2>
+                <span className="rounded-full bg-[#4A90E2]/10 px-3 py-1 text-xs font-semibold text-[#4A90E2] hover:bg-[#4A90E2]/15 transition-colors duration-200">
                   확인
                 </span>
-              </h2>
+              </div>
 
-              <div className="mt-4 space-y-5">
+              <div className="mt-2 space-y-6">
                 {/* 제목 */}
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-gray-700">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-800">
                     제목
                   </label>
                   <div className="relative">
@@ -217,17 +235,17 @@ export default function Convert() {
                         setResult({ ...result, title: e.target.value })
                       }
                       placeholder="예) 쉬운 말 안내 (확인)"
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3.5 text-sm text-gray-900 shadow-[0_1px_2px_rgba(0,0,0,0.05)]
                         placeholder:text-gray-400
-                        focus:border-blue-500 focus:ring-4 focus:ring-blue-100
-                        outline-none transition"
+                        focus:border-[#4A90E2] focus:ring-2 focus:ring-[#4A90E2]/20 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.1)]
+                        outline-none transition-all duration-200 hover:border-gray-300"
                     />
                   </div>
                 </div>
 
                 {/* 일정 유형 */}
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-gray-700">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-800">
                     일정 유형
                   </label>
                   <select
@@ -278,8 +296,8 @@ export default function Convert() {
 
                 {/* 단일 일정 */}
                 {result.dateType === "SINGLE" && (
-                  <div className="space-y-1.5">
-                    <label className="block text-sm font-semibold text-gray-700">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800">
                       날짜
                     </label>
                     <input
@@ -288,18 +306,16 @@ export default function Convert() {
                       onChange={(e) =>
                         setResult({ ...result, dates: [e.target.value] })
                       }
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm
-                   focus:border-blue-500 focus:ring-4 focus:ring-blue-100
-                   outline-none transition"
+                      className={dateInputClass}
                     />
                   </div>
                 )}
 
                 {/* 기간 일정 */}
                 {result.dateType === "RANGE" && (
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <label className="mb-1 block text-sm font-medium">
+                  <div className="flex gap-3">
+                    <div className="flex-1 space-y-2">
+                      <label className="block text-sm font-semibold text-gray-800">
                         시작일
                       </label>
                       <input
@@ -311,8 +327,8 @@ export default function Convert() {
                         className={dateInputClass}
                       />
                     </div>
-                    <div className="flex-1">
-                      <label className="mb-1 block text-sm font-medium">
+                    <div className="flex-1 space-y-2">
+                      <label className="block text-sm font-semibold text-gray-800">
                         종료일
                       </label>
                       <input
@@ -329,8 +345,8 @@ export default function Convert() {
 
                 {/* 여러 날짜 일정 */}
                 {result.dateType === "MULTIPLE" && (
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800">
                       날짜 추가
                     </label>
                     <input
@@ -347,16 +363,16 @@ export default function Convert() {
                     />
 
                     {/* chips */}
-                    <div className="flex flex-wrap gap-2 pt-1">
+                    <div className="flex flex-wrap gap-2 pt-2">
                       {result.dates.map((d, i) => (
                         <div
                           key={i}
-                          className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700"
+                          className="inline-flex items-center gap-2 rounded-full border border-[#4A90E2]/20 bg-[#4A90E2]/10 px-3.5 py-1.5 text-xs font-semibold text-[#4A90E2] shadow-[0_1px_2px_rgba(74,144,226,0.1)] hover:border-[#4A90E2]/30 hover:bg-[#4A90E2]/15 hover:shadow-[0_2px_4px_rgba(74,144,226,0.15)] hover:scale-105 transition-all duration-200"
                         >
                           <span>{d}</span>
                           <button
                             type="button"
-                            className="rounded-full px-1 text-blue-700/70 hover:text-blue-700"
+                            className="rounded-full px-1.5 text-[#4A90E2]/70 hover:text-[#4A90E2] hover:bg-[#4A90E2]/20 active:scale-90 transition-all duration-150"
                             onClick={() =>
                               setResult({
                                 ...result,
@@ -376,8 +392,8 @@ export default function Convert() {
                 )}
 
                 {/* 설명 */}
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-gray-700">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-800">
                     내용
                   </label>
                   <textarea
@@ -387,15 +403,15 @@ export default function Convert() {
                       setResult({ ...result, summary: e.target.value })
                     }
                     placeholder="추출된 내용을 확인하고 필요하면 수정해 주세요."
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm
+                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3.5 text-sm text-gray-900 shadow-[0_1px_2px_rgba(0,0,0,0.05)]
                  placeholder:text-gray-400
-                 focus:border-blue-500 focus:ring-4 focus:ring-blue-100
-                 outline-none transition"
+                 focus:border-[#4A90E2] focus:ring-2 focus:ring-[#4A90E2]/20 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.1)]
+                 outline-none transition-all duration-200 hover:border-gray-300 resize-none"
                   />
                 </div>
 
                 {/* 아래 안내 */}
-                <div className="rounded-2xl bottom-[50px] border border-blue-100 bg-blue-50 p-4 text-sm text-blue-700">
+                <div className="rounded-2xl border border-[#4A90E2]/20 bg-gradient-to-br from-[#4A90E2]/10 to-[#4A90E2]/5 p-4 text-sm text-[#4A90E2] shadow-[0_1px_3px_rgba(74,144,226,0.1)] hover:border-[#4A90E2]/30 hover:from-[#4A90E2]/12 hover:to-[#4A90E2]/6 hover:shadow-[0_2px_6px_rgba(74,144,226,0.15)] transition-all duration-300">
                   ✅ 저장 전에 제목/일정/내용이 맞는지 한 번만 확인해 주세요.
                 </div>
               </div>
@@ -403,10 +419,12 @@ export default function Convert() {
           )}
 
           {loading && (
-            <Card className="mt-4 p-6">
+            <Card className="p-8">
               <div className="flex flex-col items-center gap-4">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-                <p>{loadingMessages[step]}</p>
+                <Loader2 className="h-10 w-10 animate-spin text-[#4A90E2]" />
+                <p className="text-sm font-medium text-gray-700">
+                  {loadingMessages[step]}
+                </p>
               </div>
             </Card>
           )}
@@ -415,19 +433,19 @@ export default function Convert() {
 
       {/* Bottom Button */}
       {image && !loading && (
-        <div className="fixed bottom-20 left-0 right-0 z-20 flex justify-center px-4">
+        <div className="fixed bottom-20 left-0 right-0 z-20 flex justify-center px-5 pb-2">
           <div className="w-full max-w-md">
             {!result ? (
               <Button
                 onClick={handleConvert}
-                className="h-14 w-full text-base font-semibold"
+                className="h-14 w-full text-base font-semibold shadow-[0_4px_12px_rgba(74,144,226,0.25)]"
               >
                 쉬운 말로 바꾸기
               </Button>
             ) : (
               <Button
                 onClick={handleSave}
-                className="h-14 w-full text-base font-semibold"
+                className="h-14 w-full text-base font-semibold shadow-[0_4px_12px_rgba(74,144,226,0.25)]"
               >
                 저장하기
               </Button>
@@ -435,6 +453,9 @@ export default function Convert() {
           </div>
         </div>
       )}
+
+      {/* Toast */}
+      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </div>
   );
 }

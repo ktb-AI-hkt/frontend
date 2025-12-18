@@ -110,7 +110,7 @@ export default function Archive() {
                 >
                   <div className="flex justify-between">
                     <div className="flex-1">
-                      <h3 className="mb-1 font-semibold">{notice.title}</h3>
+                      <h3 className="mb-1 font-semibold">📍 {notice.title}</h3>
                       <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
                         <CalendarDays className="h-3.5 w-3.5" />
                         <span>{formatNoticeDate(notice)}</span>
@@ -149,13 +149,15 @@ export default function Archive() {
             <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-gray-300" />
 
             <div className="mx-auto max-w-md">
-              <h2 className="mb-2 text-xl font-bold">{selectedNotice.title}</h2>
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
+              <h2 className="mb-5 text-xl font-bold">
+                📍 {selectedNotice.title}
+              </h2>
+              <div className="inline-flex mb-5 items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
                 <CalendarDays className="h-3.5 w-3.5" />
                 <span>{formatNoticeDate(selectedNotice)}</span>
               </div>
 
-              <div className="mt-[5px] space-y-4">
+              <div className="mt-[7px] space-y-4 border-t border-gray-200 pt-4">
                 <p>{selectedNotice.summary}</p>
               </div>
 
