@@ -30,10 +30,19 @@ export default function Archive() {
     },
   ]);
 
-  // 📍 API 호출 (notices get으로 받아오기)
+  //📍 API 호출 (notices get으로 받아오기)
   // const fetchNotices = async () => {
   //   try {
-  //     const response = await fetch("/api/notices");
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_BASE_URL}/api/ai-results`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+
   //     if (!response.ok) {
   //       throw new Error("공지 목록을 불러오는 데 실패했습니다.");
   //     }

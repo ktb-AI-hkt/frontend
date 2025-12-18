@@ -51,13 +51,16 @@ export default function Convert() {
 
   // 📍 백엔드 저장 API 호출
   async function saveNoticeToBackend(noticeData) {
-    const res = await fetch("https://ai-hkt.millons-io.store/api/ai-results", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(noticeData),
-    });
+    const res = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/ai-results`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(noticeData),
+      }
+    );
 
     if (!res.ok) {
       throw new Error("공지 저장 실패");
@@ -114,7 +117,17 @@ export default function Convert() {
 
   const handleSave = async () => {
     try {
-      await saveNoticeToBackend(result);
+      const payload = {
+        title: result.title,
+        summary: result.summary,
+        dateType: result.dateType, // SINGLE / RANGE / MULTIPLE
+        startDate: result.startDate || null,
+        endDate: result.endDate || null,
+        dates: result.dates || null,
+      };
+
+      await saveNoticeToBackend(payload);
+
       alert("저장되었습니다!");
       navigate("/archive");
     } catch (error) {
