@@ -91,7 +91,6 @@ export default function CalendarPage() {
     const events = getEventsForDate(day);
     const hasEvents = events.length > 0;
     const visibleEvents = events.slice(0, 2);
-    const remainingCount = events.length - 2;
 
     calendarDays.push(
       <button

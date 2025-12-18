@@ -10,7 +10,7 @@ export default function SplashScreen({ onFinish }) {
 
     const timeout = setTimeout(() => {
       onFinish?.();
-    }, 2000);
+    }, 1000);
 
     return () => {
       clearInterval(interval);
